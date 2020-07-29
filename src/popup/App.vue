@@ -10,6 +10,11 @@
       @toggle-sidebar="showSidebar = !showSidebar"
     />
 
+    <button @click="clickHandler">
+      <!--eslint-disable-line vue-i18n/no-raw-text-->
+      Emit exception
+    </button>
+
     <router-view :key="$route.fullPath" />
 
     <transition name="slide">
@@ -123,6 +128,9 @@ export default {
     });
   },
   methods: {
+    clickHandler() {
+      throw new Error('This should be displayed in a modal');
+    },
     async init() {
       await this.$watchUntilTruly(() => this.sdk);
       if (!window.RUNNING_IN_POPUP && process.env.IS_EXTENSION) {
