@@ -9,14 +9,13 @@ describe('Test cases for Withdraw Page', () => {
     cy.get('[data-cy=send-container]')
       .should('be.visible')
 
-      .get('[data-cy=toggle-currency-dropdown]')
+      .get('[data-cy=currency-dropdown] [data-cy=custom-dropdown]')
       .should('be.visible')
       .click()
-      .get('[data-cy=currency-dropdown]')
+      .get('[data-cy=currency-dropdown] [data-cy=custom-dropdown]')
       .should('have.class', 'show')
-      .get('[data-cy=toggle-currency-dropdown]')
       .click()
-      .get('[data-cy=currency-dropdown]')
+      .get('[data-cy=currency-dropdown] [data-cy=custom-dropdown]')
       .should('not.have.class', 'show')
 
       .get('[data-cy=scan-button]')
