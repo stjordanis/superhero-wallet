@@ -410,7 +410,9 @@ export const AVATAR_CONFIG = {
 export const IDENTICON_SIZES = {
   'x-small': 20,
   small: 30,
+  mid: 36,
   normal: 38,
+  'x-lg': 56,
   lg: 64,
 };
 
