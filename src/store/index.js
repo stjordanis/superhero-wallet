@@ -36,7 +36,9 @@ const initialState = {
   sdk: null,
   middleware: null,
   tipping: null,
+  tippingV2: null,
   tippingAddress: null,
+  tippingAddressV2: null,
   mainLoading: true,
   nodeStatus: 'connecting',
   currencies: {},
@@ -51,6 +53,11 @@ const initialState = {
   tourStartBar: true,
   saveErrorLog: true,
   loginTargetLocation: { name: 'account' },
+  tokenInfo: [],
+  tokenBalances: [],
+  selectedToken: {},
+  nextTokensFetch: null,
+  tokensPublicInfo: [],
 };
 
 export default new Vuex.Store({
@@ -91,6 +98,8 @@ export default new Vuex.Store({
         tourStartBar,
         tokens: { all },
         invites,
+        nextTokensFetch,
+        tokensPublicInfo,
       }) => ({
         migrations,
         current,
@@ -109,6 +118,8 @@ export default new Vuex.Store({
         tourStartBar,
         tokens: { all },
         invites,
+        nextTokensFetch,
+        tokensPublicInfo,
       }),
     ),
     modals,

@@ -45,6 +45,9 @@ export default {
   setTipping(state, payload) {
     state.tipping = payload;
   },
+  setTippingV2(state, payload) {
+    state.tippingV2 = payload;
+  },
   setMainLoading(state, payload) {
     state.mainLoading = payload;
   },
@@ -96,10 +99,30 @@ export default {
   setTippingAddress(state, payload) {
     state.tippingAddress = payload;
   },
+  setTippingAddressV2(state, payload) {
+    state.tippingAddressV2 = payload;
+  },
   setSaveErrorLog(state) {
     state.saveErrorLog = !state.saveErrorLog;
   },
   setLoginTargetLocation(state, location) {
     state.loginTargetLocation = location;
+  },
+  setTokenInfo(state, payload) {
+    state.tokenInfo = payload;
+  },
+  addTokenBalance(state, payload) {
+    state.tokenBalances = [payload, ...state.tokenBalances]
+      .filter((bal, idx, arr) => !arr.slice(0, idx).some(b => b.contract === bal.contract))
+      .sort((a, b) => a.contract.localeCompare(b.contract));
+  },
+  setSelectedToken(state, payload) {
+    state.selectedToken = payload;
+  },
+  setTokensPublicInfo(state, payload) {
+    state.tokensPublicInfo = payload;
+  },
+  setNextTokensFetch(state, payload) {
+    state.nextTokensFetch = payload;
   },
 };

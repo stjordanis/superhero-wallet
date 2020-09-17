@@ -2,6 +2,8 @@ import { Node, MemoryAccount, RpcWallet } from '@aeternity/aepp-sdk/es';
 import Swagger from '@aeternity/aepp-sdk/es/utils/swagger';
 import { BrowserWindowMessageConnection } from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message';
 import { isEmpty, times } from 'lodash-es';
+import BigNumber from 'bignumber.js';
+import FUNGIBLE_TOKEN_CONTRACT from 'aeternity-fungible-token/FungibleTokenFullInterface.aes';
 import store from '../store';
 import { postMessage } from '../popup/utils/connection';
 import {
@@ -10,9 +12,11 @@ import {
   IN_FRAME,
   toURL,
   getAeppAccountPermission,
+  convertToken,
 } from '../popup/utils/helper';
-import { TIPPING_CONTRACT, NO_POPUP_AEPPS } from '../popup/utils/constants';
+import { TIPPING_CONTRACT, TIPPING_CONTRACT_V2, NO_POPUP_AEPPS } from '../popup/utils/constants';
 import Logger from './logger';
+import Backend from './backend';
 
 async function initMiddleware() {
   const { middlewareUrl } = store.getters.activeNetwork;
@@ -55,13 +59,55 @@ async function getKeyPair() {
 }
 
 async function initContractInstances() {
-  if (!store.getters.mainnet && !process.env.RUNNING_IN_TESTS) return;
+  if (!store.getters.mainnet && !process.env.RUNNING_IN_TESTS && process.env.NETWORK !== 'Testnet')
+    return;
   const contractAddress = await store.dispatch('getTipContractAddress');
-  store.commit(
-    'setTipping',
-    await store.state.sdk.getContractInstance(TIPPING_CONTRACT, {
-      contractAddress,
-      forceCodeCheck: true,
+  const contractAddressV2 = await store.dispatch('getTipContractAddressV2');
+  const contractInstance = await store.state.sdk.getContractInstance(TIPPING_CONTRACT, {
+    contractAddress,
+    forceCodeCheck: true,
+  });
+  const contractInstanceV2 = await store.state.sdk.getContractInstance(TIPPING_CONTRACT_V2, {
+    contractAddress: contractAddressV2,
+    forceCodeCheck: true,
+  });
+  store.commit('setTipping', contractInstance);
+  store.commit('setTippingV2', contractInstanceV2);
+}
+
+async function tokenBalance(token, address) {
+  const tokenContract = await store.state.sdk.getContractInstance(FUNGIBLE_TOKEN_CONTRACT, {
+    contractAddress: token,
+  });
+
+  const { decodedResult } = await tokenContract.methods.balance(address);
+  return new BigNumber(decodedResult || 0).toFixed();
+}
+
+async function loadTokenBalances(address) {
+  const tokens = await Backend.getTokenBalances(address);
+  await Promise.all(
+    Object.entries(tokens).map(async token => {
+      const balance = await tokenBalance(token[0], address);
+      const convertedBalance = parseFloat(convertToken(balance, -token[1].decimals)).toFixed(2);
+      const infoIndex = store.state.tokenInfo.findIndex(({ contract }) => contract === token[0]);
+      const objectStructure = {
+        value: token[0],
+        text: `${convertedBalance} ${token[1].symbol}`,
+        symbol: token[1].symbol,
+        name: token[1].name,
+        decimals: token[1].decimals,
+        contract: token[0],
+        balance,
+        convertedBalance,
+      };
+      if (infoIndex !== -1) {
+        const tokenInfo = [...store.state.tokenInfo];
+        tokenInfo[infoIndex] = { ...objectStructure };
+        store.commit('setTokenInfo', tokenInfo);
+      }
+
+      return store.commit('addTokenBalance', objectStructure);
     }),
   );
 }
@@ -102,6 +148,18 @@ export default {
     const account = MemoryAccount({ keypair });
     try {
       const acceptCb = (_, { accept }) => accept();
+
+      let tokenInfo = await Backend.getTokenInfo();
+
+      tokenInfo = Object.entries(tokenInfo).map(token => ({
+        symbol: token[1].symbol,
+        name: token[1].name,
+        decimals: token[1].decimals,
+        contract: token[0],
+      }));
+      if (tokenInfo.length > 0) {
+        store.commit('setTokenInfo', tokenInfo);
+      }
       const sdk = await RpcWallet.compose({
         methods: {
           address: async () => store.getters.account.publicKey,
@@ -184,6 +242,7 @@ export default {
       await initContractInstances();
       await initMiddleware();
       store.commit('setNodeStatus', 'connected');
+      loadTokenBalances(keypair.publicKey);
       setTimeout(() => store.commit('setNodeStatus', ''), 2000);
     } catch (e) {
       store.commit('setNodeStatus', 'error');

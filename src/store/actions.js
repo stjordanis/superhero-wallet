@@ -96,6 +96,22 @@ export default {
       }
     }
   },
+  async getTokensPublicInfo({ state: { nextTokensFetch, current }, commit }) {
+    if (!nextTokensFetch || nextTokensFetch <= new Date().getTime()) {
+      // TODO: Add different tokens than Aeternity
+      try {
+        const tokens = (
+          await axios.get(
+            `https://api.coingecko.com/api/v3/coins/markets?ids=aeternity&vs_currency=${current.currency}`,
+          )
+        ).data;
+        commit('setTokensPublicInfo', tokens);
+        commit('setNextTokensFetch', new Date().getTime() + 3600000);
+      } catch (e) {
+        console.error(`Cannot fetch tokens: ${e}`);
+      }
+    }
+  },
   async setPermissionForAccount({ commit, state: { connectedAepps } }, { host, account }) {
     if (connectedAepps[host]) {
       if (connectedAepps[host].includes(account)) return;
@@ -125,7 +141,6 @@ export default {
 
     return { addresses: uniq(addresses).filter(a => a), tab };
   },
-
   async getTipContractAddress({ state: { sdk }, getters: { activeNetwork }, commit }) {
     const { tipContract } = activeNetwork;
     const contractAddress = tipContract.includes('.chain')
@@ -134,6 +149,15 @@ export default {
     commit('setTippingAddress', contractAddress);
     return contractAddress;
   },
+  async getTipContractAddressV2({ state: { sdk }, getters: { activeNetwork }, commit }) {
+    const { tipContractV2 } = activeNetwork;
+    const contractAddressV2 = tipContractV2.includes('.chain')
+      ? getAddressByNameEntry(await sdk.api.getNameEntryByName(tipContractV2), 'contract_pubkey')
+      : tipContractV2;
+    commit('setTippingAddressV2', contractAddressV2);
+    return contractAddressV2;
+  },
+
   async getHeight({ state: { sdk } }) {
     return (await sdk.topBlock()).height;
   },
