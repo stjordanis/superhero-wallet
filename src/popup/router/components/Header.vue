@@ -5,8 +5,9 @@
       <Logo :class="$route.path === '/intro' && !isLoggedIn ? 'intro_style' : ''" v-else />
 
       <div class="title">
-        <span v-show="title">{{ $t(`pages.titles.${title}`) }}</span>
-        <span v-show="!title">{{ $t('pages.titles.home') }}</span>
+        <span v-if="customTitle">{{ customTitle }}</span>
+        <span v-else-if="title">{{ $t(`pages.titles.${title}`) }}</span>
+        <span v-else>{{ $t('pages.titles.home') }}</span>
       </div>
 
       <div v-if="isLoggedIn">
@@ -40,6 +41,9 @@ export default {
     ...mapState(['tourRunning', 'isLoggedIn', 'notifications']),
     title() {
       return this.$route.meta.title;
+    },
+    customTitle() {
+      return this.$route.params.customTitle;
     },
     showNavigation() {
       return this.$route.meta.navigation !== undefined ? this.$route.meta.navigation : true;
@@ -88,7 +92,7 @@ export default {
     color: $white-1;
 
     .title {
-      font-size: 18px;
+      font-size: 16px;
     }
 
     &:not(.isLoggedIn) .title {

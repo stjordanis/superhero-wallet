@@ -50,6 +50,11 @@ const unbind = router.beforeEach(async (to, from, next) => {
 });
 
 router.beforeEach(async (to, from, next) => {
+  if (to.name === 'token-details' && !to.params.data) {
+    next('/');
+    return;
+  }
+
   if (store.state.isLoggedIn) {
     if (!store.state.sdk) wallet.initSdk();
     next(to.meta.ifNotAuthOnly ? '/account' : undefined);
