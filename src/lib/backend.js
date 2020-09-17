@@ -1,6 +1,6 @@
 // copied from https://github.com/aeternity/superhero-ui/blob/178bc2d63cb362ddc3b2163fed58deb2e253ec00/src/utils/backend.js
 
-const BACKEND_URL = 'https://raendom-backend.z52da5wt.xyz';
+const BACKEND_URL = 'https://test-tipping.aeternity.art';
 
 const wrapTry = async promise => {
   try {
@@ -124,4 +124,8 @@ export default class Backend {
   static getProfileImageUrl = address => `${BACKEND_URL}/profile/image/${address}`;
 
   static getCommentById = async id => backendFetch(`comment/api/${id}`);
+
+  static getTokenInfo = async () => backendFetch('tokenCache/tokenInfo');
+
+  static getTokenBalances = async address => backendFetch(`tokenCache/balances?address=${address}`);
 }
