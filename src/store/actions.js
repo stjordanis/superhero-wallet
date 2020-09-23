@@ -141,21 +141,15 @@ export default {
 
     return { addresses: uniq(addresses).filter(a => a), tab };
   },
-  async getTipContractAddress({ state: { sdk }, getters: { activeNetwork }, commit }) {
+  async getTipContractAddress({ getters: { activeNetwork }, commit }) {
     const { tipContract } = activeNetwork;
-    const contractAddress = tipContract.includes('.chain')
-      ? getAddressByNameEntry(await sdk.api.getNameEntryByName(tipContract), 'contract_pubkey')
-      : tipContract;
-    commit('setTippingAddress', contractAddress);
-    return contractAddress;
+    commit('setTippingAddress', tipContract);
+    return tipContract;
   },
-  async getTipContractAddressV2({ state: { sdk }, getters: { activeNetwork }, commit }) {
+  async getTipContractAddressV2({ getters: { activeNetwork }, commit }) {
     const { tipContractV2 } = activeNetwork;
-    const contractAddressV2 = tipContractV2.includes('.chain')
-      ? getAddressByNameEntry(await sdk.api.getNameEntryByName(tipContractV2), 'contract_pubkey')
-      : tipContractV2;
-    commit('setTippingAddressV2', contractAddressV2);
-    return contractAddressV2;
+    commit('setTippingAddressV2', tipContractV2);
+    return tipContractV2;
   },
 
   async getHeight({ state: { sdk } }) {
