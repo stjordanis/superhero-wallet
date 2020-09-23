@@ -89,7 +89,7 @@ async function loadTokenBalances(address) {
   await Promise.all(
     Object.entries(tokens).map(async token => {
       const balance = await tokenBalance(token[0], address);
-      const convertedBalance = parseFloat(convertToken(balance, -token[1].decimals)).toFixed(2);
+      const convertedBalance = convertToken(balance, -token[1].decimals).toFixed(2);
       const infoIndex = store.state.tokenInfo.findIndex(({ contract }) => contract === token[0]);
       const objectStructure = {
         value: token[0],
