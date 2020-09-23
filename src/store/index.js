@@ -56,8 +56,6 @@ const initialState = {
   tokenInfo: {},
   tokenBalances: [],
   selectedToken: {},
-  nextTokensFetch: null,
-  tokensPublicInfo: [],
 };
 
 export default new Vuex.Store({
@@ -98,8 +96,6 @@ export default new Vuex.Store({
         tourStartBar,
         tokens: { all },
         invites,
-        nextTokensFetch,
-        tokensPublicInfo,
       }) => ({
         migrations,
         current,
@@ -118,8 +114,6 @@ export default new Vuex.Store({
         tourStartBar,
         tokens: { all },
         invites,
-        nextTokensFetch,
-        tokensPublicInfo,
       }),
     ),
     modals,

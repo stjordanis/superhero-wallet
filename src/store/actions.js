@@ -96,22 +96,6 @@ export default {
       }
     }
   },
-  async getTokensPublicInfo({ state: { nextTokensFetch, current }, commit }) {
-    if (!nextTokensFetch || nextTokensFetch <= new Date().getTime()) {
-      // TODO: Add different tokens than Aeternity
-      try {
-        const tokens = (
-          await axios.get(
-            `https://api.coingecko.com/api/v3/coins/markets?ids=aeternity&vs_currency=${current.currency}`,
-          )
-        ).data;
-        commit('setTokensPublicInfo', tokens);
-        commit('setNextTokensFetch', new Date().getTime() + 3600000);
-      } catch (e) {
-        console.error(`Cannot fetch tokens: ${e}`);
-      }
-    }
-  },
   async setPermissionForAccount({ commit, state: { connectedAepps } }, { host, account }) {
     if (connectedAepps[host]) {
       if (connectedAepps[host].includes(account)) return;

@@ -98,7 +98,6 @@ export default {
     );
 
     this.$store.dispatch('getCurrencies');
-    this.$store.dispatch('getTokensPublicInfo');
     if (process.env.IS_EXTENSION && detect().name !== 'firefox') {
       const [update] = await browser.runtime.requestUpdateCheck();
       if (update === 'update_available' && !process.env.RUNNING_IN_TESTS) {

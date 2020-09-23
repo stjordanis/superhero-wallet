@@ -119,10 +119,4 @@ export default {
   setSelectedToken(state, payload) {
     state.selectedToken = payload;
   },
-  setTokensPublicInfo(state, payload) {
-    state.tokensPublicInfo = payload;
-  },
-  setNextTokensFetch(state, payload) {
-    state.nextTokensFetch = payload;
-  },
 };

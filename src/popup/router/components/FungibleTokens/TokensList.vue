@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import { mapState, mapGetters } from 'vuex';
 import TokenDisplay from './TokenDisplay';
 import { removeDuplicates } from '../../../utils/helper';
@@ -24,8 +25,23 @@ export default {
     showMyTokens: { type: Boolean },
     searchTerm: { type: String, default: '' },
   },
+  data: () => ({
+    tokensPublicInfo: {},
+  }),
+  async created() {
+    try {
+      const tokens = (
+        await axios.get(
+          `https://api.coingecko.com/api/v3/coins/markets?ids=aeternity&vs_currency=${this.current.currency}`,
+        )
+      ).data;
+      this.tokensPublicInfo = tokens && tokens.length > 0 ? tokens : {};
+    } catch (e) {
+      console.error(`Cannot fetch tokens: ${e}`);
+    }
+  },
   computed: {
-    ...mapState(['tokenBalances', 'tokenInfo', 'tokensPublicInfo']),
+    ...mapState(['tokenBalances', 'tokenInfo', 'current']),
     ...mapGetters(['tokenBalance', 'balanceCurrency']),
     /**
      * Returns the default aeternity meta information
