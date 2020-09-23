@@ -90,7 +90,6 @@ async function loadTokenBalances(address) {
     Object.entries(tokens).map(async token => {
       const balance = await tokenBalance(token[0], address);
       const convertedBalance = convertToken(balance, -token[1].decimals).toFixed(2);
-      const infoIndex = store.state.tokenInfo.findIndex(({ contract }) => contract === token[0]);
       const objectStructure = {
         value: token[0],
         text: `${convertedBalance} ${token[1].symbol}`,
@@ -101,9 +100,9 @@ async function loadTokenBalances(address) {
         balance,
         convertedBalance,
       };
-      if (infoIndex !== -1) {
-        const tokenInfo = [...store.state.tokenInfo];
-        tokenInfo[infoIndex] = { ...objectStructure };
+      if (Object.keys(store.state.tokenInfo[token[0]].length > 0)) {
+        const tokenInfo = { ...store.state.tokenInfo };
+        tokenInfo[token[0]] = { ...objectStructure };
         store.commit('setTokenInfo', tokenInfo);
       }
 
@@ -149,15 +148,8 @@ export default {
     try {
       const acceptCb = (_, { accept }) => accept();
 
-      let tokenInfo = await Backend.getTokenInfo();
-
-      tokenInfo = Object.entries(tokenInfo).map(token => ({
-        symbol: token[1].symbol,
-        name: token[1].name,
-        decimals: token[1].decimals,
-        contract: token[0],
-      }));
-      if (tokenInfo.length > 0) {
+      const tokenInfo = await Backend.getTokenInfo();
+      if (Object.keys(tokenInfo).length > 0) {
         store.commit('setTokenInfo', tokenInfo);
       }
       const sdk = await RpcWallet.compose({

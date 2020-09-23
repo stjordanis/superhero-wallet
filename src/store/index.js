@@ -53,7 +53,7 @@ const initialState = {
   tourStartBar: true,
   saveErrorLog: true,
   loginTargetLocation: { name: 'account' },
-  tokenInfo: [],
+  tokenInfo: {},
   tokenBalances: [],
   selectedToken: {},
   nextTokensFetch: null,

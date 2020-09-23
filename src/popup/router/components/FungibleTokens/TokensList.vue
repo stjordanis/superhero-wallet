@@ -14,6 +14,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import TokenDisplay from './TokenDisplay';
+import { removeDuplicates } from '../../../utils/helper';
 
 export default {
   components: {
@@ -26,7 +27,10 @@ export default {
   computed: {
     ...mapState(['tokenBalances', 'tokenInfo', 'tokensPublicInfo']),
     ...mapGetters(['tokenBalance', 'balanceCurrency']),
-    aeternityTokenInfo() {
+    /**
+     * Returns the default aeternity meta information
+     */
+    aeternityToken() {
       return {
         ...this.tokensPublicInfo[0],
         convertedBalance: this.tokenBalance,
@@ -35,41 +39,43 @@ export default {
         contract: '',
       };
     },
+    /**
+     * Converts the token information object into a searchable list
+     */
+    convertedTokenInfo() {
+      return Object.entries(this.tokenInfo).map(token => ({
+        name: token[1].name,
+        symbol: token[1].symbol,
+        contract: token[0],
+        decimals: token[1].decimals,
+        convertedBalance: token[1].convertedBalance,
+      }));
+    },
+    tokensInfo() {
+      return [{ ...this.aeternityToken }, ...this.convertedTokenInfo];
+    },
     filteredResults() {
       let tokensList = null;
 
-      tokensList = this.tokenInfo;
+      tokensList = this.tokensInfo;
 
       if (this.showMyTokens) {
-        tokensList = [...this.tokenBalances];
-      }
-
-      const hasDefaultToken = tokensList.findIndex(({ name }) => name === 'Aeternity');
-
-      if (hasDefaultToken === -1) {
-        tokensList.unshift({ ...this.aeternityTokenInfo });
+        tokensList = [{ ...this.aeternityToken }, ...this.tokenBalances];
       }
 
       if (this.searchTerm.trim().length === 0) {
-        return this.removeDuplicates(tokensList);
+        return removeDuplicates(tokensList);
       }
 
       const term = this.searchTerm.trim().toLowerCase();
 
-      const symbolResults = tokensList.filter(token => token.symbol.toLowerCase().includes(term));
-
-      const nameResults = tokensList.filter(token => token.name.toLowerCase().includes(term));
-
-      const contractResults = tokensList.filter(token =>
-        token.contract.toLowerCase().includes(term),
+      const searchResults = tokensList.filter(
+        token =>
+          token.symbol.toLowerCase().includes(term) ||
+          token.name.toLowerCase().includes(term) ||
+          token.contract.toLowerCase().includes(term),
       );
-      return this.removeDuplicates([...symbolResults, ...nameResults, ...contractResults]);
-    },
-  },
-  methods: {
-    removeDuplicates(arr) {
-      const convertResultToSet = new Set([...arr]);
-      return [...convertResultToSet];
+      return removeDuplicates([...searchResults]);
     },
   },
 };
