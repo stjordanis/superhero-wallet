@@ -66,15 +66,10 @@ export default {
       ];
     },
     currenciesOptions() {
-      const currenciesList = [];
-
-      Object.keys(this.currencies).forEach(currencyKey => {
-        currenciesList.push({
-          text: currencyKey.toUpperCase(),
-          value: currencyKey,
-        });
-      });
-      return currenciesList;
+      return Object.keys(this.currencies).map(currencyKey => ({
+        text: currencyKey.toUpperCase(),
+        value: currencyKey,
+      }));
     },
   },
   created() {
