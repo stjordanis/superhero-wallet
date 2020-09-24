@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import axios from 'axios';
 import { mapState, mapGetters } from 'vuex';
+import Backend from '../../../../lib/backend';
 import TokenDisplay from './TokenDisplay';
 import { removeDuplicates } from '../../../utils/helper';
 
@@ -30,12 +30,7 @@ export default {
   }),
   async created() {
     try {
-      const tokens = (
-        await axios.get(
-          `https://api.coingecko.com/api/v3/coins/markets?ids=aeternity&vs_currency=${this.current.currency}`,
-        )
-      ).data;
-      this.tokensPublicInfo = tokens && tokens.length > 0 ? tokens : {};
+      this.tokensPublicInfo = await Backend.getAeternityInfo(this.current.currency);
     } catch (e) {
       console.error(`Cannot fetch tokens: ${e}`);
     }

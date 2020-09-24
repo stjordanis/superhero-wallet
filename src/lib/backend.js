@@ -128,4 +128,9 @@ export default class Backend {
   static getTokenInfo = async () => backendFetch('tokenCache/tokenInfo');
 
   static getTokenBalances = async address => backendFetch(`tokenCache/balances?address=${address}`);
+
+  static getAeternityInfo = async currency =>
+    wrapTry(
+      fetch(`https://api.coingecko.com/api/v3/coins/markets?ids=aeternity&vs_currency=${currency}`),
+    );
 }
