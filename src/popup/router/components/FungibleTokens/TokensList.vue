@@ -62,7 +62,7 @@ export default {
       return Object.entries(this.tokenInfo).map(([contract, tokenData]) => ({
         name: tokenData.name,
         symbol: tokenData.symbol,
-        contract: contract,
+        contract,
         decimals: tokenData.decimals,
         convertedBalance: tokenData.convertedBalance,
       }));
