@@ -4,6 +4,8 @@ import { BrowserWindowMessageConnection } from '@aeternity/aepp-sdk/es/utils/aep
 import { isEmpty, times } from 'lodash-es';
 import BigNumber from 'bignumber.js';
 import FUNGIBLE_TOKEN_CONTRACT from 'aeternity-fungible-token/FungibleTokenFullInterface.aes';
+import TIPPING_V1_INTERFACE from 'tipping-contract/Tipping_v1_Interface.aes';
+import TIPPING_V2_INTERFACE from 'tipping-contract/Tipping_v2_Interface.aes';
 import store from '../store';
 import { postMessage } from '../popup/utils/connection';
 import {
@@ -14,7 +16,8 @@ import {
   getAeppAccountPermission,
   convertToken,
 } from '../popup/utils/helper';
-import { TIPPING_CONTRACT, TIPPING_CONTRACT_V2, NO_POPUP_AEPPS } from '../popup/utils/constants';
+import { NO_POPUP_AEPPS } from '../popup/utils/constants';
+
 import Logger from './logger';
 import Backend from './backend';
 
@@ -59,15 +62,19 @@ async function getKeyPair() {
 }
 
 async function initContractInstances() {
-  if (!store.getters.mainnet && !process.env.RUNNING_IN_TESTS && process.env.NETWORK !== 'Testnet')
+  if (
+    !store.getters.mainnet &&
+    !process.env.RUNNING_IN_TESTS &&
+    store.getters.activeNetwork.name !== 'Testnet'
+  )
     return;
   const contractAddress = await store.dispatch('getTipContractAddress');
   const contractAddressV2 = await store.dispatch('getTipContractAddressV2');
-  const contractInstance = await store.state.sdk.getContractInstance(TIPPING_CONTRACT, {
+  const contractInstance = await store.state.sdk.getContractInstance(TIPPING_V1_INTERFACE, {
     contractAddress,
     forceCodeCheck: true,
   });
-  const contractInstanceV2 = await store.state.sdk.getContractInstance(TIPPING_CONTRACT_V2, {
+  const contractInstanceV2 = await store.state.sdk.getContractInstance(TIPPING_V2_INTERFACE, {
     contractAddress: contractAddressV2,
     forceCodeCheck: true,
   });
