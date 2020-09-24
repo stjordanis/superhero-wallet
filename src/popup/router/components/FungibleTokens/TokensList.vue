@@ -59,12 +59,12 @@ export default {
      * Converts the token information object into a searchable list
      */
     convertedTokenInfo() {
-      return Object.entries(this.tokenInfo).map(token => ({
-        name: token[1].name,
-        symbol: token[1].symbol,
-        contract: token[0],
-        decimals: token[1].decimals,
-        convertedBalance: token[1].convertedBalance,
+      return Object.entries(this.tokenInfo).map(([contract, tokenData]) => ({
+        name: tokenData.name,
+        symbol: tokenData.symbol,
+        contract: contract,
+        decimals: tokenData.decimals,
+        convertedBalance: tokenData.convertedBalance,
       }));
     },
     tokensInfo() {

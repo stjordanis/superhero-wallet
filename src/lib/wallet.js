@@ -94,22 +94,22 @@ async function tokenBalance(token, address) {
 async function loadTokenBalances(address) {
   const tokens = await Backend.getTokenBalances(address);
   await Promise.all(
-    Object.entries(tokens).map(async token => {
-      const balance = await tokenBalance(token[0], address);
-      const convertedBalance = convertToken(balance, -token[1].decimals).toFixed(2);
+    Object.entries(tokens).map(async ([contract, tokenData]) => {
+      const balance = await tokenBalance(contract, address);
+      const convertedBalance = convertToken(balance, -tokenData.decimals).toFixed(2);
       const objectStructure = {
-        value: token[0],
-        text: `${convertedBalance} ${token[1].symbol}`,
-        symbol: token[1].symbol,
-        name: token[1].name,
-        decimals: token[1].decimals,
-        contract: token[0],
+        value: contract,
+        text: `${convertedBalance} ${tokenData.symbol}`,
+        symbol: tokenData.symbol,
+        name: tokenData.name,
+        decimals: tokenData.decimals,
+        contract,
         balance,
         convertedBalance,
       };
-      if (Object.keys(store.state.tokenInfo[token[0]].length > 0)) {
+      if (Object.keys(store.state.tokenInfo[contract].length > 0)) {
         const tokenInfo = { ...store.state.tokenInfo };
-        tokenInfo[token[0]] = { ...objectStructure };
+        tokenInfo[contract] = { ...objectStructure };
         store.commit('setTokenInfo', tokenInfo);
       }
 
