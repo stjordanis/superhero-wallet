@@ -9,7 +9,8 @@
     <p class="primary-title text-left mb-8 f-16">
       {{ $t('pages.successTip.successfullySent') }}
       <span class="secondary-text" data-cy="tip-amount"
-        >{{ amountTip }} {{ $t('pages.appVUE.aeid') }}
+        >{{ isFungibleToken ? amount : amountTip }}
+        {{ isFungibleToken ? selectedToken.symbol : $t('pages.appVUE.aeid') }}
       </span>
       <!--eslint-disable vue-i18n/no-raw-text-->
       ({{ formatCurrency((amountTip * currentCurrencyRate).toFixed(3)) }})
@@ -18,16 +19,19 @@
     </p>
     <a class="link-sm text-left block" data-cy="tip-url">{{ tipUrl }}</a>
     <br />
-    <div>
+    <div v-if="!isFungibleToken">
       <span style="word-break: break-word; font-size: 14px; float: left;">{{
         $t('pages.successTip.notify')
       }}</span>
       <Textarea v-model="note" :value="note" size="h-50" />
     </div>
-    <p class="f-14 sub-heading text-left" v-if="!(tipUrl && verifiedUrls.includes(tipUrl))">
+    <p
+      class="f-14 sub-heading text-left"
+      v-if="!isFungibleToken && !(tipUrl && verifiedUrls.includes(tipUrl))"
+    >
       {{ $t('pages.successTip.note') }}
     </p>
-    <p class="f-18 my-35">{{ $t('pages.successTip.letThemKnow') }}</p>
+    <p v-if="!isFungibleToken" class="f-18 my-35">{{ $t('pages.successTip.letThemKnow') }}</p>
     <div>
       <div class="flex flex-align-center flex-justify-between">
         <Button half @click="$router.push('/tip')" data-cy="to-tips">
@@ -46,7 +50,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import axios from 'axios';
 import Heart from '../../../icons/heart.svg?vue-component';
 import Textarea from '../components/Textarea';
@@ -68,7 +72,8 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['formatCurrency', 'currentCurrencyRate']),
+    ...mapGetters(['formatCurrency', 'currentCurrencyRate', 'isFungibleToken']),
+    ...mapState(['selectedToken']),
     amountTip() {
       return (+aettosToAe(this.amount)).toFixed(2);
     },

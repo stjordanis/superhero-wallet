@@ -91,36 +91,35 @@ async function tokenBalance(token, address) {
   return new BigNumber(decodedResult || 0).toFixed();
 }
 
-async function loadTokenBalances(address) {
-  const tokens = await Backend.getTokenBalances(address);
-  await Promise.all(
-    Object.entries(tokens).map(async ([contract, tokenData]) => {
-      const balance = await tokenBalance(contract, address);
-      const convertedBalance = convertToken(balance, -tokenData.decimals).toFixed(2);
-      const objectStructure = {
-        value: contract,
-        text: `${convertedBalance} ${tokenData.symbol}`,
-        symbol: tokenData.symbol,
-        name: tokenData.name,
-        decimals: tokenData.decimals,
-        contract,
-        balance,
-        convertedBalance,
-      };
-      if (Object.keys(store.state.tokenInfo[contract].length > 0)) {
-        const tokenInfo = { ...store.state.tokenInfo };
-        tokenInfo[contract] = { ...objectStructure };
-        store.commit('setTokenInfo', tokenInfo);
-      }
-
-      return store.commit('addTokenBalance', objectStructure);
-    }),
-  );
-}
-
 let initSdkRunning = false;
 
 export default {
+  async loadTokenBalances(address) {
+    const tokens = await Backend.getTokenBalances(address);
+    await Promise.all(
+      Object.entries(tokens).map(async ([contract, tokenData]) => {
+        const balance = await tokenBalance(contract, address);
+        const convertedBalance = convertToken(balance, -tokenData.decimals).toFixed(2);
+        const objectStructure = {
+          value: contract,
+          text: `${convertedBalance} ${tokenData.symbol}`,
+          symbol: tokenData.symbol,
+          name: tokenData.name,
+          decimals: tokenData.decimals,
+          contract,
+          balance,
+          convertedBalance,
+        };
+        if (Object.keys(store.state.tokenInfo[contract].length > 0)) {
+          const tokenInfo = { ...store.state.tokenInfo };
+          tokenInfo[contract] = { ...objectStructure };
+          store.commit('setTokenInfo', tokenInfo);
+        }
+
+        return store.commit('addTokenBalance', objectStructure);
+      }),
+    );
+  },
   async init() {
     const { account } = store.getters;
     if (isEmpty(account)) {
@@ -241,7 +240,7 @@ export default {
       await initContractInstances();
       await initMiddleware();
       store.commit('setNodeStatus', 'connected');
-      loadTokenBalances(keypair.publicKey);
+      this.loadTokenBalances(keypair.publicKey);
       setTimeout(() => store.commit('setNodeStatus', ''), 2000);
     } catch (e) {
       store.commit('setNodeStatus', 'error');

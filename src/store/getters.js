@@ -42,4 +42,7 @@ export default {
       ? state.tokens[state.current.token].balance.toFixed(2)
       : state.balance.toFixed(2);
   },
+  isFungibleToken(state) {
+    return Object.keys(state.selectedToken).length > 0;
+  },
 };

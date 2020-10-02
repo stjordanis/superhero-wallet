@@ -19,8 +19,7 @@
           data-cy="tip-button"
           :text="$t('pages.account.send')"
           accent
-          :disabled="!allowTipping"
-          :to="allowTipping ? { name: 'tip' } : {}"
+          :to="{ name: 'tip' }"
           class="tour__step2"
         >
           <Tip slot="icon" />
