@@ -84,7 +84,7 @@ export const defaultNetworks = [
     networkId: 'ae_mainnet',
     middlewareUrl: 'https://mainnet.aeternity.io',
     explorerUrl: 'https://mainnet.aeternal.io',
-    compilerUrl: 'https://compiler.aepps.com',
+    compilerUrl: 'https://latest.compiler.aepps.com',
     tokenRegistry: 'ct_UAzV9RcXEMsFcUCmrPN4iphbZroM7EHk3wvdidDYgZGGBo3hV',
     tokenRegistryLima: 'ct_UAzV9RcXEMsFcUCmrPN4iphbZroM7EHk3wvdidDYgZGGBo3hV',
     tipContract: 'superhero.chain',
